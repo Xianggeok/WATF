@@ -1,6 +1,6 @@
 # [WATF] Why Are They Fighting?
 
-![alt text](https://img.shields.io/badge/License-MIT-blue.svg)![alt text](https://img.shields.io/badge/Minecraft-1.20.1-green)
+![alt text](https://img.shields.io/badge/License-MIT-blue.svg)   ![alt text](https://img.shields.io/badge/Minecraft-1.21.1-green)
 
 **他们为什么要打架?**
 
