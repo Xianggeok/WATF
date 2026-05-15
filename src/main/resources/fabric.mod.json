@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "watf",
+	"version": "${version}",
+	"name": "Why Are They Fighting?",
+	"description": "Use magical staffs to make mobs fight each other! Includes duel and team battle modes.",
+	"authors": [
+		"XiangGe_OvO"
+	],
+	"contact": {
+		"homepage": "https://github.com/Xianggeok/WATF",
+		"sources": "https://github.com/Xianggeok/WATF"
+	},
+	"license": "MIT",
+	"icon": "assets/watf/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"top.eley.watf.Watf"
+		],
+		"client": [
+			"top.eley.watf.WatfClient"
+		]
+	},
+	"mixins": [
+		"watf.mixins.json",
+		{
+			"config": "watf.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.2",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

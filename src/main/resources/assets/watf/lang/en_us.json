@@ -1,0 +1,9 @@
+{
+  "item.watf.duel_staff": "Duel Staff",
+  "item.watf.duel_staff.desc": "§7Select two mobs to make them fight 1v1",
+  "item.watf.duel_staff.desc2": "§7Works on non-passive mobs",
+  "item.watf.team_battle": "Team Battle Staff",
+  "item.watf.team_battle.desc": "§7Select two species to start a team battle",
+  "item.watf.team_battle.desc2": "§7All nearby same-species mobs will join",
+  "itemGroup.watf.main": "Why Are They Fighting?"
+}

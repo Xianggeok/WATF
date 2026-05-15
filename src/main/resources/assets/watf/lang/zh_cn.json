@@ -1,0 +1,9 @@
+{
+  "item.watf.duel_staff": "决斗法杖",
+  "item.watf.duel_staff.desc": "§7选中两个生物，让它们进行1v1决斗",
+  "item.watf.duel_staff.desc2": "§7对非被动生物有效",
+  "item.watf.team_battle": "团战法杖",
+  "item.watf.team_battle.desc": "§7选中两个物种，让它们进行群体团战",
+  "item.watf.team_battle.desc2": "§7搜索范围内所有同种生物参战",
+  "itemGroup.watf.main": "他们为什么要打架?"
+}
