@@ -24,7 +24,7 @@
 
 ## 📥 下载
 
-前往 [Release 页面](https://github.com/Xianggeok/WATF/releases) 下载最新版本的 jar 文件。
+前往 [Modrinth](https://modrinth.com/project/XAgkS2Pl) 下载最新版本的 jar 文件。
 
 ## 🔧 合成配方
 
