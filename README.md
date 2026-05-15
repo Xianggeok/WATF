@@ -1,9 +1,11 @@
 # [WATF] Why Are They Fighting?
 
+![alt text](https://img.shields.io/badge/License-MIT-blue.svg)[alt text](https://img.shields.io/badge/Minecraft-1.20.1-green)
+
 **他们为什么要打架?**
 
 一个 Minecraft Fabric 模组，添加了两个神奇的法杖，可以让生物之间互相战斗！
-![alt text](https://img.shields.io/badge/License-MIT-blue.svg)[text](https://img.shields.io/badge/Minecraft-1.20.1-green)
+
 
 ## ✨ 功能
 
