@@ -1,0 +1,38 @@
+{
+  "display": {
+    "icon": {
+      "id": "watf:duel_staff",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancement.watf.craft_duel_staff.title"
+    },
+    "description": {
+      "translate": "advancement.watf.craft_duel_staff.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "watf:root",
+  "criteria": {
+    "has_duel_staff": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "watf:duel_staff"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_duel_staff"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

@@ -1,0 +1,38 @@
+{
+  "display": {
+    "icon": {
+      "id": "watf:team_battle",
+      "count": 1
+    },
+    "title": {
+      "translate": "advancement.watf.craft_team_battle.title"
+    },
+    "description": {
+      "translate": "advancement.watf.craft_team_battle.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "watf:root",
+  "criteria": {
+    "has_team_battle": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "watf:team_battle"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_team_battle"
+    ]
+  ],
+  "sends_telemetry_event": false
+}
