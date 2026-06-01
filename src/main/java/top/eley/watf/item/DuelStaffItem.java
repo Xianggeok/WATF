@@ -21,7 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import top.eley.watf.mixin.PiglinBruteAiInvoker;
 
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.HashMap;
@@ -125,7 +125,7 @@ public class DuelStaffItem extends Item {
             // 触发成就：世纪大战
             if (player instanceof ServerPlayer serverPlayer) {
                 AdvancementHolder adv = serverPlayer.level().getServer().getAdvancements().get(
-                        ResourceLocation.fromNamespaceAndPath("watf", "start_duel"));
+                        Identifier.fromNamespaceAndPath("watf", "start_duel"));
                 if (adv != null) {
                     serverPlayer.getAdvancements().award(adv, "manual");
                 }

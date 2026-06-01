@@ -7,7 +7,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -32,7 +32,7 @@ public class Watf implements net.fabricmc.api.ModInitializer {
     private static Item registerItem(String name, Item item) {
         return Registry.register(
                 BuiltInRegistries.ITEM,
-                ResourceLocation.fromNamespaceAndPath(MOD_ID, name),
+                Identifier.fromNamespaceAndPath(MOD_ID, name),
                 item
         );
     }
@@ -41,7 +41,7 @@ public class Watf implements net.fabricmc.api.ModInitializer {
 
     public static final ResourceKey<CreativeModeTab> TAB_KEY = ResourceKey.create(
             Registries.CREATIVE_MODE_TAB,
-            ResourceLocation.fromNamespaceAndPath(MOD_ID, "main")
+            Identifier.fromNamespaceAndPath(MOD_ID, "main")
     );
 
     public static final CreativeModeTab WATF_TAB = Registry.register(
