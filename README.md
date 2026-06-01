@@ -1,7 +1,7 @@
 # [WATF] Why Are They Fighting?
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Minecraft Version](https://img.shields.io/badge/Minecraft-1.21.1-green)]()
+[![Minecraft Version](https://img.shields.io/badge/Minecraft-1.21~26.1.2-green)]()
 [![Fabric](https://img.shields.io/badge/Loader-Fabric-5C469C?logo=fabric)](https://fabricmc.net/)
 
 **他们为什么要打架?**
@@ -22,9 +22,33 @@
 - 自动搜索范围内所有同种生物参战
 - 支持大规模物种对战
 
+## 🌿 多版本支持
+
+本模组支持多个 Minecraft 版本，每个版本对应一个独立分支：
+
+| 分支 | MC 版本 | Java | Loader |
+|------|---------|------|--------|
+| `main` | 1.21.1 | 21 | fabric-loom-remap |
+| `1.21` | 1.21 | 21 | fabric-loom-remap |
+| `1.21.2` | 1.21.2 | 21 | fabric-loom-remap |
+| `1.21.3` | 1.21.3 | 21 | fabric-loom-remap |
+| `1.21.4` | 1.21.4 | 21 | fabric-loom-remap |
+| `1.21.5` | 1.21.5 | 21 | fabric-loom-remap |
+| `1.21.6` | 1.21.6 | 21 | fabric-loom-remap |
+| `1.21.7` | 1.21.7 | 21 | fabric-loom-remap |
+| `1.21.8` | 1.21.8 | 21 | fabric-loom-remap |
+| `1.21.9` | 1.21.9 | 21 | fabric-loom-remap |
+| `1.21.10` | 1.21.10 | 21 | fabric-loom-remap |
+| `1.21.11` | 1.21.11 | 21 | fabric-loom-remap |
+| `26.1` | 26.1 | 25 | fabric-loom |
+| `26.1.1` | 26.1.1 | 25 | fabric-loom |
+| `26.1.2` | 26.1.2 | 25 | fabric-loom |
+
+切换版本：`git checkout <分支名>`
+
 ## 📥 下载
 
-前往 [Release](https://github.com/Xianggeok/WATF/releases/latest) 或 [Modrinth](https://modrinth.com/project/XAgkS2Pl) 下载最新版本的 jar 文件。
+前往 [Release](https://github.com/Xianggeok/WATF/releases/latest) 或 [Modrinth](https://modrinth.com/project/XAgkS2Pl) 下载对应版本的 jar 文件。
 
 ## 🔧 合成配方
 
@@ -71,19 +95,22 @@
 git clone https://github.com/Xianggeok/WATF.git
 cd WATF
 
+# 切换到目标版本分支
+git checkout 1.21.4  # 或其他版本分支
+
 # 构建
 ./gradlew build
 
 # 构建产物位于
-# build/libs/watf-1.0.0.jar
+# build/libs/watf-1.1.0.jar
 ```
 
 ## 📋 环境要求
 
-- Minecraft 1.21.1
+- Minecraft 1.21 ~ 26.1.2
 - Fabric Loader >= 0.19.2
 - Fabric API
-- Java 21
+- Java 21（1.21.x）/ Java 25（26.x）
 
 ## 🔗 链接
 
