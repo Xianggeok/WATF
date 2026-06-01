@@ -3,6 +3,7 @@ package top.eley.watf.mixin;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinBrute;
 import net.minecraft.world.entity.monster.piglin.PiglinBruteAi;
+import net.minecraft.server.level.ServerLevel;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
@@ -12,7 +13,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(PiglinBruteAi.class)
 public interface PiglinBruteAiInvoker {
     @Invoker("wasHurtBy")
-    static void invokeWasHurtBy(PiglinBrute brute, LivingEntity attacker) {
+    static void invokeWasHurtBy(ServerLevel level, PiglinBrute brute, LivingEntity attacker) {
         throw new AssertionError();
     }
     
