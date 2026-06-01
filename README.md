@@ -1,5 +1,7 @@
 # [WATF] Why Are They Fighting?
 
+> 🌐 [English](README_EN.md) | 中文
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Minecraft Version](https://img.shields.io/badge/Minecraft-26.1.1-green)]()
 [![Fabric](https://img.shields.io/badge/Loader-Fabric-5C469C?logo=fabric)](https://fabricmc.net/)
