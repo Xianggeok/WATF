@@ -26,6 +26,8 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
