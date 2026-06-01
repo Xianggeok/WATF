@@ -14,7 +14,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -43,6 +43,7 @@ public class TeamBattleItem extends Item {
         super(new Item.Properties()
                 .stacksTo(1)
                 .durability(32)
+                .setId(top.eley.watf.Watf.TEAM_BATTLE_KEY)
         );
     }
 
@@ -53,33 +54,33 @@ public class TeamBattleItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         if (level.isClientSide) {
-            return InteractionResultHolder.pass(stack);
+            return InteractionResult.PASS;
         }
 
         Entity targetEntity = getTargetEntity(player, level);
 
         if (targetEntity == null) {
             player.displayClientMessage(Component.translatable("msg.watf.no_target_team"), true);
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         if (!(targetEntity instanceof LivingEntity)) {
             player.displayClientMessage(Component.translatable("msg.watf.cannot_fight"), true);
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         if (targetEntity instanceof AgeableMob) {
             player.displayClientMessage(Component.translatable("msg.watf.species_passive"), true);
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         if (targetEntity.equals(player)) {
             player.displayClientMessage(Component.translatable("msg.watf.no_self_team"), true);
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         EntityType<?> targetType = targetEntity.getType();
@@ -91,13 +92,13 @@ public class TeamBattleItem extends Item {
             player.displayClientMessage(Component.translatable("msg.watf.first_species", speciesName), true);
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0f, 1.5f);
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS;
         } else {
             EntityType<?> firstType = FIRST_TYPE.remove(playerId);
 
             if (firstType.equals(targetType)) {
                 player.displayClientMessage(Component.translatable("msg.watf.different_species"), true);
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
 
             // 搜索范围内所有属于这两个物种的生物
@@ -125,12 +126,12 @@ public class TeamBattleItem extends Item {
 
             if (teamA.isEmpty()) {
                 player.displayClientMessage(Component.translatable("msg.watf.species_not_found", speciesAName), true);
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
 
             if (teamB.isEmpty()) {
                 player.displayClientMessage(Component.translatable("msg.watf.species_not_found", speciesBName), true);
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
 
             // 团战：A队每个成员攻击B队，B队每个成员攻击A队
@@ -162,7 +163,7 @@ public class TeamBattleItem extends Item {
                 }
             }
 
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS;
         }
     }
 
