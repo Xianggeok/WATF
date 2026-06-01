@@ -4,6 +4,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinBrute;
 import net.minecraft.world.entity.monster.piglin.PiglinBruteAi;
 import org.spongepowered.asm.mixin.Mixin;
+import net.minecraft.server.level.ServerLevel;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 /**
