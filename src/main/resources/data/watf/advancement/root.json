@@ -10,18 +10,27 @@
     "description": {
       "translate": "advancement.watf.root.description"
     },
-    "background": "minecraft:textures/block/deepslate_tiles.png",
+    "background": "minecraft:block/deepslate_tiles",
     "show_toast": true,
     "announce_to_chat": true
   },
   "criteria": {
-    "tick": {
-      "trigger": "minecraft:tick"
+    "has_blaze_powder": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:blaze_powder"
+            ]
+          }
+        ]
+      }
     }
   },
   "requirements": [
     [
-      "tick"
+      "has_blaze_powder"
     ]
   ],
   "sends_telemetry_event": false
