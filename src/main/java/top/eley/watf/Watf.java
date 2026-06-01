@@ -25,12 +25,12 @@ public class Watf implements net.fabricmc.api.ModInitializer {
 
     public static final ResourceKey<Item> DUEL_STAFF_KEY = ResourceKey.create(
             Registries.ITEM,
-            ResourceLocation.fromNamespaceAndPath(MOD_ID, "duel_staff")
+            Identifier.fromNamespaceAndPath(MOD_ID, "duel_staff")
     );
 
     public static final ResourceKey<Item> TEAM_BATTLE_KEY = ResourceKey.create(
             Registries.ITEM,
-            ResourceLocation.fromNamespaceAndPath(MOD_ID, "team_battle")
+            Identifier.fromNamespaceAndPath(MOD_ID, "team_battle")
     );
 
 
