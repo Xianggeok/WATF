@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(PiglinBruteAi.class)
 public interface PiglinBruteAiInvoker {
     @Invoker("wasHurtBy")
-    static void invokeWasHurtBy(PiglinBrute brute, LivingEntity attacker) {
+    static void invokeWasHurtBy(ServerLevel level, PiglinBrute brute, LivingEntity attacker) {
         throw new AssertionError();
     }
     

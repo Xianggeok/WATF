@@ -14,14 +14,14 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import top.eley.watf.mixin.PiglinBruteAiInvoker;
 
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.HashMap;
@@ -46,39 +46,39 @@ public class DuelStaffItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("item.watf.duel_staff.desc"));
-        tooltip.add(Component.translatable("item.watf.duel_staff.desc2"));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> consumer, TooltipFlag flag) {
+        consumer.accept(Component.translatable("item.watf.duel_staff.desc"));
+        consumer.accept(Component.translatable("item.watf.duel_staff.desc2"));
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
-        if (level.isClientSide) {
-            return InteractionResultHolder.pass(stack);
+        if (level.isClientSide()) {
+            return InteractionResult.PASS(stack);
         }
 
         Entity targetEntity = getTargetEntity(player, level);
 
         if (targetEntity == null) {
-            player.displayClientMessage(Component.translatable("msg.watf.no_target"), true);
-            return InteractionResultHolder.fail(stack);
+            player.sendSystemMessage(Component.translatable("msg.watf.no_target"));
+            return InteractionResult.FAIL(stack);
         }
 
         if (!(targetEntity instanceof LivingEntity livingTarget)) {
-            player.displayClientMessage(Component.translatable("msg.watf.cannot_fight"), true);
-            return InteractionResultHolder.fail(stack);
+            player.sendSystemMessage(Component.translatable("msg.watf.cannot_fight"));
+            return InteractionResult.FAIL(stack);
         }
 
         if (targetEntity instanceof AgeableMob) {
-            player.displayClientMessage(Component.translatable("msg.watf.too_passive"), true);
-            return InteractionResultHolder.fail(stack);
+            player.sendSystemMessage(Component.translatable("msg.watf.too_passive"));
+            return InteractionResult.FAIL(stack);
         }
 
         if (targetEntity.equals(player)) {
-            player.displayClientMessage(Component.translatable("msg.watf.no_self"), true);
-            return InteractionResultHolder.fail(stack);
+            player.sendSystemMessage(Component.translatable("msg.watf.no_self"));
+            return InteractionResult.FAIL(stack);
         }
 
         UUID playerId = player.getUUID();
@@ -86,26 +86,26 @@ public class DuelStaffItem extends Item {
         if (!FIRST_TARGET.containsKey(playerId)) {
             FIRST_TARGET.put(playerId, targetEntity);
             String name = targetEntity.getName().getString();
-            player.displayClientMessage(Component.translatable("msg.watf.first_selected", name), true);
+            player.sendSystemMessage(Component.translatable("msg.watf.first_selected", name));
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0f, 1.5f);
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS(stack);
         } else {
             Entity firstEntity = FIRST_TARGET.remove(playerId);
 
             if (firstEntity.equals(targetEntity)) {
-                player.displayClientMessage(Component.translatable("msg.watf.different_opponent"), true);
-                return InteractionResultHolder.fail(stack);
+                player.sendSystemMessage(Component.translatable("msg.watf.different_opponent"));
+                return InteractionResult.FAIL(stack);
             }
 
             if (!firstEntity.isAlive() || firstEntity.isRemoved()) {
-                player.displayClientMessage(Component.translatable("msg.watf.first_gone"), true);
-                return InteractionResultHolder.fail(stack);
+                player.sendSystemMessage(Component.translatable("msg.watf.first_gone"));
+                return InteractionResult.FAIL(stack);
             }
 
             if (!(firstEntity instanceof LivingEntity firstLiving)) {
-                player.displayClientMessage(Component.translatable("msg.watf.first_cannot_fight"), true);
-                return InteractionResultHolder.fail(stack);
+                player.sendSystemMessage(Component.translatable("msg.watf.first_cannot_fight"));
+                return InteractionResult.FAIL(stack);
             }
 
             // 让两个生物互相攻击
@@ -116,20 +116,20 @@ public class DuelStaffItem extends Item {
 
             String name1 = firstEntity.getName().getString();
             String name2 = targetEntity.getName().getString();
-            player.displayClientMessage(Component.translatable("msg.watf.duel_start", name1, name2), true);
+            player.sendSystemMessage(Component.translatable("msg.watf.duel_start", name1, name2));
 
             stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
 
             // 触发成就：世纪大战
             if (player instanceof ServerPlayer serverPlayer) {
                 AdvancementHolder adv = serverPlayer.server.getAdvancements().get(
-                        ResourceLocation.fromNamespaceAndPath("watf", "start_duel"));
+                        Identifier.fromNamespaceAndPath("watf", "start_duel"));
                 if (adv != null) {
                     serverPlayer.getAdvancements().award(adv, "manual");
                 }
             }
 
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS(stack);
         }
     }
 

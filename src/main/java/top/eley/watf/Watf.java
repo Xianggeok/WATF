@@ -1,13 +1,13 @@
 package top.eley.watf;
 
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -32,7 +32,7 @@ public class Watf implements net.fabricmc.api.ModInitializer {
     private static Item registerItem(String name, Item item) {
         return Registry.register(
                 BuiltInRegistries.ITEM,
-                ResourceLocation.fromNamespaceAndPath(MOD_ID, name),
+                Identifier.fromNamespaceAndPath(MOD_ID, name),
                 item
         );
     }
@@ -41,13 +41,13 @@ public class Watf implements net.fabricmc.api.ModInitializer {
 
     public static final ResourceKey<CreativeModeTab> TAB_KEY = ResourceKey.create(
             Registries.CREATIVE_MODE_TAB,
-            ResourceLocation.fromNamespaceAndPath(MOD_ID, "main")
+            Identifier.fromNamespaceAndPath(MOD_ID, "main")
     );
 
     public static final CreativeModeTab WATF_TAB = Registry.register(
             BuiltInRegistries.CREATIVE_MODE_TAB,
             TAB_KEY,
-            FabricItemGroup.builder()
+            FabricCreativeModeTab.builder()
                     .icon(() -> new ItemStack(DUEL_STAFF))
                     .title(Component.translatable("itemGroup.watf.main"))
                     .build()
@@ -58,9 +58,9 @@ public class Watf implements net.fabricmc.api.ModInitializer {
         LOGGER.info("[WATF] Why Are They Fighting? Mod loaded!");
 
         // 把道具添加到自定义标签页
-        ItemGroupEvents.modifyEntriesEvent(TAB_KEY).register(entries -> {
-            entries.prepend(DUEL_STAFF);
-            entries.prepend(TEAM_BATTLE);
+        CreativeModeTabEvents.modifyOutputEvent(TAB_KEY).register(output -> {
+            output.prepend(DUEL_STAFF);
+            output.prepend(TEAM_BATTLE);
         });
     }
 }
