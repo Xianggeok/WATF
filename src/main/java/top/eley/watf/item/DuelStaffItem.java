@@ -14,7 +14,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -42,6 +42,7 @@ public class DuelStaffItem extends Item {
         super(new Item.Properties()
                 .stacksTo(1)
                 .durability(64)
+                .setId(top.eley.watf.Watf.DUEL_STAFF_KEY)
         );
     }
 
@@ -52,33 +53,33 @@ public class DuelStaffItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         if (level.isClientSide) {
-            return InteractionResultHolder.pass(stack);
+            return InteractionResult.PASS;
         }
 
         Entity targetEntity = getTargetEntity(player, level);
 
         if (targetEntity == null) {
             player.displayClientMessage(Component.translatable("msg.watf.no_target"), true);
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         if (!(targetEntity instanceof LivingEntity livingTarget)) {
             player.displayClientMessage(Component.translatable("msg.watf.cannot_fight"), true);
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         if (targetEntity instanceof AgeableMob) {
             player.displayClientMessage(Component.translatable("msg.watf.too_passive"), true);
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         if (targetEntity.equals(player)) {
             player.displayClientMessage(Component.translatable("msg.watf.no_self"), true);
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         UUID playerId = player.getUUID();
@@ -89,23 +90,23 @@ public class DuelStaffItem extends Item {
             player.displayClientMessage(Component.translatable("msg.watf.first_selected", name), true);
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0f, 1.5f);
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS;
         } else {
             Entity firstEntity = FIRST_TARGET.remove(playerId);
 
             if (firstEntity.equals(targetEntity)) {
                 player.displayClientMessage(Component.translatable("msg.watf.different_opponent"), true);
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
 
             if (!firstEntity.isAlive() || firstEntity.isRemoved()) {
                 player.displayClientMessage(Component.translatable("msg.watf.first_gone"), true);
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
 
             if (!(firstEntity instanceof LivingEntity firstLiving)) {
                 player.displayClientMessage(Component.translatable("msg.watf.first_cannot_fight"), true);
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
 
             // 让两个生物互相攻击
@@ -129,7 +130,7 @@ public class DuelStaffItem extends Item {
                 }
             }
 
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS;
         }
     }
 
