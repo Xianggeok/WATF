@@ -37,11 +37,17 @@ jobs:
         java-version: ${{ steps.java.outputs.version }}
         distribution: 'temurin'
 
+    - name: Debug info
+      run: |
+        java -version
+        ./gradlew --version
+
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew build --info 2>&1 | tail -100
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
+      if: success()
       with:
         name: WATF-${{ github.ref_name }}
         path: build/libs/*.jar
