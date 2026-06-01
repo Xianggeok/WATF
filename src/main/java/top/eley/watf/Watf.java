@@ -7,7 +7,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -24,12 +23,6 @@ public class Watf implements net.fabricmc.api.ModInitializer {
 
     // ========== 道具注册 ==========
 
-    // 决斗法杖
-    public static final Item DUEL_STAFF = registerItem(DUEL_STAFF_KEY, new DuelStaffItem());
-
-    // 团战法杖
-    public static final Item TEAM_BATTLE = registerItem(TEAM_BATTLE_KEY, new TeamBattleItem());
-
     public static final ResourceKey<Item> DUEL_STAFF_KEY = ResourceKey.create(
             Registries.ITEM,
             ResourceLocation.fromNamespaceAndPath(MOD_ID, "duel_staff")
@@ -39,6 +32,15 @@ public class Watf implements net.fabricmc.api.ModInitializer {
             Registries.ITEM,
             ResourceLocation.fromNamespaceAndPath(MOD_ID, "team_battle")
     );
+
+
+    // 决斗法杖
+    public static final Item DUEL_STAFF = registerItem(DUEL_STAFF_KEY, new DuelStaffItem());
+
+    // 团战法杖
+    public static final Item TEAM_BATTLE = registerItem(TEAM_BATTLE_KEY, new TeamBattleItem());
+
+
 
     private static Item registerItem(ResourceKey<Item> key, Item item) {
         return Registry.register(
