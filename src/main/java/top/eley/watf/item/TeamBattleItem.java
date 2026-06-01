@@ -18,6 +18,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import top.eley.watf.Watf;
 
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.resources.Identifier;
@@ -45,6 +46,7 @@ public class TeamBattleItem extends Item {
         super(new Item.Properties()
                 .stacksTo(1)
                 .durability(32)
+                .setId(Watf.TEAM_BATTLE_KEY)
         );
     }
 
@@ -58,7 +60,7 @@ public class TeamBattleItem extends Item {
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
-        if (level.isClientSide()) {
+        if (level.isClientSide) {
             return InteractionResult.PASS;
         }
 
@@ -102,7 +104,6 @@ public class TeamBattleItem extends Item {
                 return InteractionResult.FAIL;
             }
 
-            // 搜索范围内所有属于这两个物种的生物
             Vec3 center = player.position();
             AABB searchArea = new AABB(
                     center.x - SEARCH_RADIUS, center.y - SEARCH_RADIUS, center.z - SEARCH_RADIUS,
@@ -135,7 +136,6 @@ public class TeamBattleItem extends Item {
                 return InteractionResult.FAIL;
             }
 
-            // 团战：A队每个成员攻击B队，B队每个成员攻击A队
             int fightCount = 0;
             for (LivingEntity memberA : teamA) {
                 LivingEntity target = teamB.get(fightCount % teamB.size());
@@ -151,11 +151,10 @@ public class TeamBattleItem extends Item {
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.WITHER_SPAWN, SoundSource.PLAYERS, 1.0f, 1.0f);
 
-            player.sendSystemMessage(Component.translatable("msg.watf.team_start", speciesAName, teamA.size(), speciesBName, teamB.size()), true);
+            player.displayClientMessage(Component.translatable("msg.watf.team_start", speciesAName, teamA.size(), speciesBName, teamB.size()), true);
 
             stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
 
-            // 触发成就：物种战争
             if (player instanceof ServerPlayer serverPlayer) {
                 AdvancementHolder adv = serverPlayer.level().getServer().getAdvancements().get(
                         Identifier.fromNamespaceAndPath("watf", "start_team_battle"));
