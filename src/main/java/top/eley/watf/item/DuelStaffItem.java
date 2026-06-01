@@ -124,7 +124,7 @@ public class DuelStaffItem extends Item {
 
             // 触发成就：世纪大战
             if (player instanceof ServerPlayer serverPlayer) {
-                AdvancementHolder adv = serverPlayer.getServer().getAdvancements().get(
+                AdvancementHolder adv = serverPlayer.level().getServer().getAdvancements().get(
                         Identifier.fromNamespaceAndPath("watf", "start_duel"));
                 if (adv != null) {
                     serverPlayer.getAdvancements().award(adv, "manual");
