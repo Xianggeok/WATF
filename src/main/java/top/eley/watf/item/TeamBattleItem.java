@@ -20,7 +20,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
@@ -158,7 +158,7 @@ public class TeamBattleItem extends Item {
             // 触发成就：物种战争
             if (player instanceof ServerPlayer serverPlayer) {
                 AdvancementHolder adv = serverPlayer.level().getServer().getAdvancements().get(
-                        Identifier.fromNamespaceAndPath("watf", "start_team_battle"));
+                        ResourceLocation.fromNamespaceAndPath("watf", "start_team_battle"));
                 if (adv != null) {
                     serverPlayer.getAdvancements().award(adv, "manual");
                 }
