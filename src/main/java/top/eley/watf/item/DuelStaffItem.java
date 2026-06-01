@@ -52,33 +52,33 @@ public class DuelStaffItem extends Item {
     }
 
     @Override
-    public InteractionResult<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         if (level.isClientSide()) {
-            return InteractionResult.PASS(stack);
+            return InteractionResult.PASS;
         }
 
         Entity targetEntity = getTargetEntity(player, level);
 
         if (targetEntity == null) {
             player.sendSystemMessage(Component.translatable("msg.watf.no_target"));
-            return InteractionResult.FAIL(stack);
+            return InteractionResult.FAIL;
         }
 
         if (!(targetEntity instanceof LivingEntity livingTarget)) {
             player.sendSystemMessage(Component.translatable("msg.watf.cannot_fight"));
-            return InteractionResult.FAIL(stack);
+            return InteractionResult.FAIL;
         }
 
         if (targetEntity instanceof AgeableMob) {
             player.sendSystemMessage(Component.translatable("msg.watf.too_passive"));
-            return InteractionResult.FAIL(stack);
+            return InteractionResult.FAIL;
         }
 
         if (targetEntity.equals(player)) {
             player.sendSystemMessage(Component.translatable("msg.watf.no_self"));
-            return InteractionResult.FAIL(stack);
+            return InteractionResult.FAIL;
         }
 
         UUID playerId = player.getUUID();
@@ -89,23 +89,23 @@ public class DuelStaffItem extends Item {
             player.sendSystemMessage(Component.translatable("msg.watf.first_selected", name));
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0f, 1.5f);
-            return InteractionResult.SUCCESS(stack);
+            return InteractionResult.SUCCESS;
         } else {
             Entity firstEntity = FIRST_TARGET.remove(playerId);
 
             if (firstEntity.equals(targetEntity)) {
                 player.sendSystemMessage(Component.translatable("msg.watf.different_opponent"));
-                return InteractionResult.FAIL(stack);
+                return InteractionResult.FAIL;
             }
 
             if (!firstEntity.isAlive() || firstEntity.isRemoved()) {
                 player.sendSystemMessage(Component.translatable("msg.watf.first_gone"));
-                return InteractionResult.FAIL(stack);
+                return InteractionResult.FAIL;
             }
 
             if (!(firstEntity instanceof LivingEntity firstLiving)) {
                 player.sendSystemMessage(Component.translatable("msg.watf.first_cannot_fight"));
-                return InteractionResult.FAIL(stack);
+                return InteractionResult.FAIL;
             }
 
             // 让两个生物互相攻击
@@ -129,7 +129,7 @@ public class DuelStaffItem extends Item {
                 }
             }
 
-            return InteractionResult.SUCCESS(stack);
+            return InteractionResult.SUCCESS;
         }
     }
 

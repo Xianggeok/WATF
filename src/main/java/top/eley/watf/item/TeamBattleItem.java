@@ -53,33 +53,33 @@ public class TeamBattleItem extends Item {
     }
 
     @Override
-    public InteractionResult<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         if (level.isClientSide()) {
-            return InteractionResult.PASS(stack);
+            return InteractionResult.PASS;
         }
 
         Entity targetEntity = getTargetEntity(player, level);
 
         if (targetEntity == null) {
             player.sendSystemMessage(Component.translatable("msg.watf.no_target_team"));
-            return InteractionResult.FAIL(stack);
+            return InteractionResult.FAIL;
         }
 
         if (!(targetEntity instanceof LivingEntity)) {
             player.sendSystemMessage(Component.translatable("msg.watf.cannot_fight"));
-            return InteractionResult.FAIL(stack);
+            return InteractionResult.FAIL;
         }
 
         if (targetEntity instanceof AgeableMob) {
             player.sendSystemMessage(Component.translatable("msg.watf.species_passive"));
-            return InteractionResult.FAIL(stack);
+            return InteractionResult.FAIL;
         }
 
         if (targetEntity.equals(player)) {
             player.sendSystemMessage(Component.translatable("msg.watf.no_self_team"));
-            return InteractionResult.FAIL(stack);
+            return InteractionResult.FAIL;
         }
 
         EntityType<?> targetType = targetEntity.getType();
@@ -91,13 +91,13 @@ public class TeamBattleItem extends Item {
             player.sendSystemMessage(Component.translatable("msg.watf.first_species", speciesName));
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0f, 1.5f);
-            return InteractionResult.SUCCESS(stack);
+            return InteractionResult.SUCCESS;
         } else {
             EntityType<?> firstType = FIRST_TYPE.remove(playerId);
 
             if (firstType.equals(targetType)) {
                 player.sendSystemMessage(Component.translatable("msg.watf.different_species"));
-                return InteractionResult.FAIL(stack);
+                return InteractionResult.FAIL;
             }
 
             // 搜索范围内所有属于这两个物种的生物
@@ -125,12 +125,12 @@ public class TeamBattleItem extends Item {
 
             if (teamA.isEmpty()) {
                 player.sendSystemMessage(Component.translatable("msg.watf.species_not_found", speciesAName));
-                return InteractionResult.FAIL(stack);
+                return InteractionResult.FAIL;
             }
 
             if (teamB.isEmpty()) {
                 player.sendSystemMessage(Component.translatable("msg.watf.species_not_found", speciesBName));
-                return InteractionResult.FAIL(stack);
+                return InteractionResult.FAIL;
             }
 
             // 团战：A队每个成员攻击B队，B队每个成员攻击A队
@@ -162,7 +162,7 @@ public class TeamBattleItem extends Item {
                 }
             }
 
-            return InteractionResult.SUCCESS(stack);
+            return InteractionResult.SUCCESS;
         }
     }
 
