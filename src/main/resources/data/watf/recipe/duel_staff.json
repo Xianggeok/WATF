@@ -6,21 +6,11 @@
     " S "
   ],
   "key": {
-    "B": {
-      "item": "minecraft:blaze_powder"
-    },
-    "N": {
-      "item": "minecraft:nether_star"
-    },
-    "A": {
-      "item": "minecraft:amethyst_shard"
-    },
-    "G": {
-      "item": "minecraft:gold_ingot"
-    },
-    "S": {
-      "item": "minecraft:stick"
-    }
+    "B": "minecraft:blaze_powder",
+    "N": "minecraft:nether_star",
+    "A": "minecraft:amethyst_shard",
+    "G": "minecraft:gold_ingot",
+    "S": "minecraft:stick"
   },
   "result": {
     "id": "watf:duel_staff",
