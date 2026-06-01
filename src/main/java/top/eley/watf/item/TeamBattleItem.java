@@ -157,7 +157,7 @@ public class TeamBattleItem extends Item {
 
             // 触发成就：物种战争
             if (player instanceof ServerPlayer serverPlayer) {
-                AdvancementHolder adv = serverPlayer.getServer().getAdvancements().get(
+                AdvancementHolder adv = serverPlayer.level().getServer().getAdvancements().get(
                         Identifier.fromNamespaceAndPath("watf", "start_team_battle"));
                 if (adv != null) {
                     serverPlayer.getAdvancements().award(adv, "manual");
