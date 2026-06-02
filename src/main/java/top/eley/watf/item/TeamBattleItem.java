@@ -20,7 +20,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
@@ -56,29 +56,29 @@ public class TeamBattleItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return InteractionResultHolder.pass(stack);
         }
 
         Entity targetEntity = getTargetEntity(player, level);
 
         if (targetEntity == null) {
-            player.displayClientMessage(Component.translatable("msg.watf.no_target_team"), true);
+            player.sendOverlayMessage(Component.translatable("msg.watf.no_target_team"));
             return InteractionResultHolder.fail(stack);
         }
 
         if (!(targetEntity instanceof LivingEntity)) {
-            player.displayClientMessage(Component.translatable("msg.watf.cannot_fight"), true);
+            player.sendOverlayMessage(Component.translatable("msg.watf.cannot_fight"));
             return InteractionResultHolder.fail(stack);
         }
 
         if (targetEntity instanceof AgeableMob) {
-            player.displayClientMessage(Component.translatable("msg.watf.species_passive"), true);
+            player.sendOverlayMessage(Component.translatable("msg.watf.species_passive"));
             return InteractionResultHolder.fail(stack);
         }
 
         if (targetEntity.equals(player)) {
-            player.displayClientMessage(Component.translatable("msg.watf.no_self_team"), true);
+            player.sendOverlayMessage(Component.translatable("msg.watf.no_self_team"));
             return InteractionResultHolder.fail(stack);
         }
 
@@ -88,7 +88,7 @@ public class TeamBattleItem extends Item {
 
         if (!FIRST_TYPE.containsKey(playerId)) {
             FIRST_TYPE.put(playerId, targetType);
-            player.displayClientMessage(Component.translatable("msg.watf.first_species", speciesName), true);
+            player.sendOverlayMessage(Component.translatable("msg.watf.first_species", speciesName));
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0f, 1.5f);
             return InteractionResultHolder.success(stack);
@@ -96,7 +96,7 @@ public class TeamBattleItem extends Item {
             EntityType<?> firstType = FIRST_TYPE.remove(playerId);
 
             if (firstType.equals(targetType)) {
-                player.displayClientMessage(Component.translatable("msg.watf.different_species"), true);
+                player.sendOverlayMessage(Component.translatable("msg.watf.different_species"));
                 return InteractionResultHolder.fail(stack);
             }
 
@@ -124,12 +124,12 @@ public class TeamBattleItem extends Item {
             }
 
             if (teamA.isEmpty()) {
-                player.displayClientMessage(Component.translatable("msg.watf.species_not_found", speciesAName), true);
+                player.sendOverlayMessage(Component.translatable("msg.watf.species_not_found", speciesAName));
                 return InteractionResultHolder.fail(stack);
             }
 
             if (teamB.isEmpty()) {
-                player.displayClientMessage(Component.translatable("msg.watf.species_not_found", speciesBName), true);
+                player.sendOverlayMessage(Component.translatable("msg.watf.species_not_found", speciesBName));
                 return InteractionResultHolder.fail(stack);
             }
 
@@ -149,14 +149,14 @@ public class TeamBattleItem extends Item {
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.WITHER_SPAWN, SoundSource.PLAYERS, 1.0f, 1.0f);
 
-            player.displayClientMessage(Component.translatable("msg.watf.team_start", speciesAName, teamA.size(), speciesBName, teamB.size()), true);
+            player.sendOverlayMessage(Component.translatable("msg.watf.team_start", speciesAName, teamA.size(), speciesBName, teamB.size()));
 
             stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
 
             // 触发成就：物种战争
             if (player instanceof ServerPlayer serverPlayer) {
                 AdvancementHolder adv = serverPlayer.server.getAdvancements().get(
-                        ResourceLocation.fromNamespaceAndPath("watf", "start_team_battle"));
+                        Identifier.fromNamespaceAndPath("watf", "start_team_battle"));
                 if (adv != null) {
                     serverPlayer.getAdvancements().award(adv, "manual");
                 }
