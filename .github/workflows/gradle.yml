@@ -1,0 +1,47 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    branches:
+      - main
+      - '1.21'
+      - '1.21.*'
+      - '26.1'
+      - '26.1.*'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Detect Java version from branch
+      id: java
+      run: |
+        BRANCH="${GITHUB_REF_NAME}"
+        if [[ "$BRANCH" == 26.1* ]]; then
+          echo "version=25" >> $GITHUB_OUTPUT
+        else
+          echo "version=21" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Set up JDK ${{ steps.java.outputs.version }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ steps.java.outputs.version }}
+        distribution: 'temurin'
+
+    - name: Build with Gradle
+      run: ./gradlew build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: WATF-${{ github.ref_name }}
+        path: build/libs/*.jar
