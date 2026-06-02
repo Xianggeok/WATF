@@ -138,6 +138,7 @@ public class DuelStaffItem extends Item {
      * 兼容所有AI类型（Goal AI + Brain AI）
      */
     public static void startFight(Level level, LivingEntity a, LivingEntity b) {
+        // 设置目标（对Goal AI生物有效）
         if (a instanceof Mob mobA) {
             mobA.setTarget(b);
         }
@@ -145,11 +146,8 @@ public class DuelStaffItem extends Item {
             mobB.setTarget(a);
         }
 
+        // 猪灵蛮兵额外设置愤怒目标（PiglinBruteAiInvoker 已验证有效）
         try {
-            // 猪灵 -> PiglinAi.setAngerTarget
-            makeAngryAt(a, b);
-            makeAngryAt(b, a);
-            // 猪灵蛮兵 -> PiglinBruteAi.setAngerTarget
             if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
                 PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
             }
@@ -158,36 +156,16 @@ public class DuelStaffItem extends Item {
             }
         } catch (Exception ignored) {
         }
-    }
 
-    /**
-     * 通过反射调用 PiglinAi.setAngerTarget，兼容各版本的方法签名差异
-     */
-    private static void makeAngryAt(LivingEntity attacker, LivingEntity target) {
-        if (!(attacker instanceof net.minecraft.world.entity.monster.piglin.Piglin piglin))
-            return;
-
-        try {
-            // wasHurtBy 是触发猪灵仇恨的标准方式，比 setAngerTarget 更可靠
-            try {
-                // 尝试 2 参数: wasHurtBy(Piglin, LivingEntity)
-                var m2 = net.minecraft.world.entity.monster.piglin.PiglinAi.class
-                    .getDeclaredMethod("wasHurtBy",
-                        net.minecraft.world.entity.monster.piglin.Piglin.class,
-                        net.minecraft.world.entity.LivingEntity.class);
-                m2.setAccessible(true);
-                m2.invoke(null, piglin, target);
-            } catch (NoSuchMethodException e2) {
-                // 尝试 3 参数: wasHurtBy(ServerLevel, Piglin, LivingEntity)
-                var m3 = net.minecraft.world.entity.monster.piglin.PiglinAi.class
-                    .getDeclaredMethod("wasHurtBy",
-                        net.minecraft.server.level.ServerLevel.class,
-                        net.minecraft.world.entity.monster.piglin.Piglin.class,
-                        net.minecraft.world.entity.LivingEntity.class);
-                m3.setAccessible(true);
-                m3.invoke(null, (net.minecraft.server.level.ServerLevel) piglin.level(), piglin, target);
+        // 通过微量伤害触发所有生物的仇恨系统
+        // 猪灵等Brain AI生物需要被攻击事件才能激活行为树中的攻击行为
+        if (level instanceof ServerLevel) {
+            if (a instanceof Mob mobA) {
+                mobA.hurt(mobA.damageSources().mobAttack(b instanceof Mob m ? m : mobA), 0.001f);
             }
-        } catch (Exception e) {
+            if (b instanceof Mob mobB) {
+                mobB.hurt(mobB.damageSources().mobAttack(a instanceof Mob m ? m : mobB), 0.001f);
+            }
         }
     }
 
