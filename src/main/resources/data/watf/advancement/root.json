@@ -10,7 +10,7 @@
     "description": {
       "translate": "advancement.watf.root.description"
     },
-    "background": "minecraft:textures/block/deepslate_tiles.png",
+    "background": "minecraft:block/deepslate_tiles",
     "show_toast": true,
     "announce_to_chat": true
   },
