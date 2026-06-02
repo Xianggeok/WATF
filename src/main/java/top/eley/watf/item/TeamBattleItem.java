@@ -138,12 +138,12 @@ public class TeamBattleItem extends Item {
             int fightCount = 0;
             for (LivingEntity memberA : teamA) {
                 LivingEntity target = teamB.get(fightCount % teamB.size());
-                DuelStaffItem.startFight(memberA, target);
+                DuelStaffItem.startFight(level, memberA, target);
                 fightCount++;
             }
             for (LivingEntity memberB : teamB) {
                 LivingEntity target = teamA.get(fightCount % teamA.size());
-                DuelStaffItem.startFight(memberB, target);
+                DuelStaffItem.startFight(level, memberB, target);
                 fightCount++;
             }
 
