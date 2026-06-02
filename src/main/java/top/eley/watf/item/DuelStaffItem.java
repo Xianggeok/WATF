@@ -18,7 +18,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import top.eley.watf.mixin.PiglinAiInvoker;
 import top.eley.watf.mixin.PiglinBruteAiInvoker;
 
 import net.minecraft.advancements.AdvancementHolder;
@@ -150,32 +149,25 @@ public class DuelStaffItem extends Item {
             mobB.setTarget(a);
         }
 
-        // 对于使用Brain AI的生物（猪灵、猪灵蛮兵），需要通过AI系统设置愤怒目标
-        if (level instanceof ServerLevel serverLevel) {
-            try {
-                // 普通猪灵 - 使用 PiglinAi.setAngerTarget
-                if (a instanceof net.minecraft.world.entity.monster.piglin.Piglin piglinA) {
-                    PiglinAiInvoker.invokeSetAngerTarget(serverLevel, piglinA, b);
-                }
-                if (b instanceof net.minecraft.world.entity.monster.piglin.Piglin piglinB) {
-                    PiglinAiInvoker.invokeSetAngerTarget(serverLevel, piglinB, a);
-                }
-                // 猪灵蛮兵 - 使用 PiglinBruteAi.setAngerTarget
-                if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
-                    PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
-                }
-                if (b instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteB) {
-                    PiglinBruteAiInvoker.invokeSetAngerTarget(bruteB, a);
-                }
-            } catch (Exception e) {
-                // 如果调用失败，使用备用方案
-                if (a instanceof Mob mobA && b instanceof Mob mobB) {
-                    mobA.hurt(mobA.damageSources().mobAttack(mobB), 0.001f);
-                    mobB.hurt(mobB.damageSources().mobAttack(mobA), 0.001f);
-                    mobA.setTarget(b);
-                    mobB.setTarget(a);
-                }
+        // 通过微量伤害触发所有生物的仇恨系统（包括Brain AI生物如猪灵）
+        if (level instanceof ServerLevel) {
+            if (a instanceof Mob mobA && b instanceof LivingEntity targetB) {
+                mobA.hurt(mobA.damageSources().mobAttack(targetB instanceof Mob m ? m : mobA), 0.001f);
             }
+            if (b instanceof Mob mobB && a instanceof LivingEntity targetA) {
+                mobB.hurt(mobB.damageSources().mobAttack(targetA instanceof Mob m ? m : mobB), 0.001f);
+            }
+        }
+
+        // 猪灵蛮兵额外设置愤怒目标
+        try {
+            if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
+                PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
+            }
+            if (b instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteB) {
+                PiglinBruteAiInvoker.invokeSetAngerTarget(bruteB, a);
+            }
+        } catch (Exception ignored) {
         }
     }
 
