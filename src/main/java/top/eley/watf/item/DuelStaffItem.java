@@ -14,10 +14,11 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import top.eley.watf.Watf;
 import top.eley.watf.mixin.PiglinBruteAiInvoker;
 
 import net.minecraft.advancements.AdvancementHolder;
@@ -26,6 +27,8 @@ import net.minecraft.server.level.ServerPlayer;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,43 +45,44 @@ public class DuelStaffItem extends Item {
         super(new Item.Properties()
                 .stacksTo(1)
                 .durability(64)
+                .setId(Watf.DUEL_STAFF_KEY)
         );
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("item.watf.duel_staff.desc"));
-        tooltip.add(Component.translatable("item.watf.duel_staff.desc2"));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> consumer, TooltipFlag flag) {
+        consumer.accept(Component.translatable("item.watf.duel_staff.desc"));
+        consumer.accept(Component.translatable("item.watf.duel_staff.desc2"));
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         if (level.isClientSide()) {
-            return InteractionResultHolder.pass(stack);
+            return InteractionResult.PASS;
         }
 
         Entity targetEntity = getTargetEntity(player, level);
 
         if (targetEntity == null) {
             player.sendOverlayMessage(Component.translatable("msg.watf.no_target"));
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         if (!(targetEntity instanceof LivingEntity livingTarget)) {
             player.sendOverlayMessage(Component.translatable("msg.watf.cannot_fight"));
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         if (targetEntity instanceof AgeableMob) {
             player.sendOverlayMessage(Component.translatable("msg.watf.too_passive"));
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         if (targetEntity.equals(player)) {
             player.sendOverlayMessage(Component.translatable("msg.watf.no_self"));
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         UUID playerId = player.getUUID();
@@ -89,26 +93,25 @@ public class DuelStaffItem extends Item {
             player.sendOverlayMessage(Component.translatable("msg.watf.first_selected", name));
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0f, 1.5f);
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS;
         } else {
             Entity firstEntity = FIRST_TARGET.remove(playerId);
 
             if (firstEntity.equals(targetEntity)) {
                 player.sendOverlayMessage(Component.translatable("msg.watf.different_opponent"));
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
 
             if (!firstEntity.isAlive() || firstEntity.isRemoved()) {
                 player.sendOverlayMessage(Component.translatable("msg.watf.first_gone"));
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
 
             if (!(firstEntity instanceof LivingEntity firstLiving)) {
                 player.sendOverlayMessage(Component.translatable("msg.watf.first_cannot_fight"));
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
 
-            // 让两个生物互相攻击
             startFight(level, firstLiving, livingTarget);
 
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -120,25 +123,19 @@ public class DuelStaffItem extends Item {
 
             stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
 
-            // 触发成就：世纪大战
             if (player instanceof ServerPlayer serverPlayer) {
-                AdvancementHolder adv = serverPlayer.server.getAdvancements().get(
+                AdvancementHolder adv = serverPlayer.level().getServer().getAdvancements().get(
                         Identifier.fromNamespaceAndPath("watf", "start_duel"));
                 if (adv != null) {
                     serverPlayer.getAdvancements().award(adv, "manual");
                 }
             }
 
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS;
         }
     }
 
-    /**
-     * 让两个生物互相仇恨并攻击对方
-     * 兼容所有AI类型（Goal AI + Brain AI）
-     */
     public static void startFight(Level level, LivingEntity a, LivingEntity b) {
-        // 设置目标（对Goal AI生物有效）
         if (a instanceof Mob mobA) {
             mobA.setTarget(b);
         }
@@ -146,7 +143,7 @@ public class DuelStaffItem extends Item {
             mobB.setTarget(a);
         }
 
-        // 猪灵蛮兵额外设置愤怒目标（PiglinBruteAiInvoker 已验证有效）
+        // 猪灵蛮兵额外设置愤怒目标
         try {
             if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
                 PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
@@ -158,7 +155,6 @@ public class DuelStaffItem extends Item {
         }
 
         // 通过微量伤害触发所有生物的仇恨系统
-        // 猪灵等Brain AI生物需要被攻击事件才能激活行为树中的攻击行为
         if (level instanceof ServerLevel) {
             if (a instanceof Mob mobA) {
                 mobA.hurt(mobA.damageSources().mobAttack(b instanceof Mob m ? m : mobA), 0.001f);

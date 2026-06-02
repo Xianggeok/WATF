@@ -14,10 +14,11 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import top.eley.watf.Watf;
 
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.resources.Identifier;
@@ -26,6 +27,8 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
+import net.minecraft.world.item.component.TooltipDisplay;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,43 +46,44 @@ public class TeamBattleItem extends Item {
         super(new Item.Properties()
                 .stacksTo(1)
                 .durability(32)
+                .setId(Watf.TEAM_BATTLE_KEY)
         );
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("item.watf.team_battle.desc"));
-        tooltip.add(Component.translatable("item.watf.team_battle.desc2"));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> consumer, TooltipFlag flag) {
+        consumer.accept(Component.translatable("item.watf.team_battle.desc"));
+        consumer.accept(Component.translatable("item.watf.team_battle.desc2"));
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         if (level.isClientSide()) {
-            return InteractionResultHolder.pass(stack);
+            return InteractionResult.PASS;
         }
 
         Entity targetEntity = getTargetEntity(player, level);
 
         if (targetEntity == null) {
             player.sendOverlayMessage(Component.translatable("msg.watf.no_target_team"));
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         if (!(targetEntity instanceof LivingEntity)) {
             player.sendOverlayMessage(Component.translatable("msg.watf.cannot_fight"));
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         if (targetEntity instanceof AgeableMob) {
             player.sendOverlayMessage(Component.translatable("msg.watf.species_passive"));
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         if (targetEntity.equals(player)) {
             player.sendOverlayMessage(Component.translatable("msg.watf.no_self_team"));
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         EntityType<?> targetType = targetEntity.getType();
@@ -91,16 +95,15 @@ public class TeamBattleItem extends Item {
             player.sendOverlayMessage(Component.translatable("msg.watf.first_species", speciesName));
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0f, 1.5f);
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS;
         } else {
             EntityType<?> firstType = FIRST_TYPE.remove(playerId);
 
             if (firstType.equals(targetType)) {
                 player.sendOverlayMessage(Component.translatable("msg.watf.different_species"));
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
 
-            // 搜索范围内所有属于这两个物种的生物
             Vec3 center = player.position();
             AABB searchArea = new AABB(
                     center.x - SEARCH_RADIUS, center.y - SEARCH_RADIUS, center.z - SEARCH_RADIUS,
@@ -125,15 +128,14 @@ public class TeamBattleItem extends Item {
 
             if (teamA.isEmpty()) {
                 player.sendOverlayMessage(Component.translatable("msg.watf.species_not_found", speciesAName));
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
 
             if (teamB.isEmpty()) {
                 player.sendOverlayMessage(Component.translatable("msg.watf.species_not_found", speciesBName));
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
 
-            // 团战：A队每个成员攻击B队，B队每个成员攻击A队
             int fightCount = 0;
             for (LivingEntity memberA : teamA) {
                 LivingEntity target = teamB.get(fightCount % teamB.size());
@@ -153,16 +155,15 @@ public class TeamBattleItem extends Item {
 
             stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
 
-            // 触发成就：物种战争
             if (player instanceof ServerPlayer serverPlayer) {
-                AdvancementHolder adv = serverPlayer.server.getAdvancements().get(
+                AdvancementHolder adv = serverPlayer.level().getServer().getAdvancements().get(
                         Identifier.fromNamespaceAndPath("watf", "start_team_battle"));
                 if (adv != null) {
                     serverPlayer.getAdvancements().award(adv, "manual");
                 }
             }
 
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS;
         }
     }
 
