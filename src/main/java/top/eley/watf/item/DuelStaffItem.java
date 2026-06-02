@@ -141,6 +141,7 @@ public class DuelStaffItem extends Item {
      * 兼容所有AI类型（Goal AI + Brain AI）
      */
     public static void startFight(Level level, LivingEntity a, LivingEntity b) {
+        // 设置Goal AI目标
         if (a instanceof Mob mobA) {
             mobA.setTarget(b);
         }
@@ -148,11 +149,18 @@ public class DuelStaffItem extends Item {
             mobB.setTarget(a);
         }
 
+        // 设置Brain AI目标（猪灵等Brain AI生物需要设置ATTACK_TARGET才能攻击）
+        if (a instanceof Mob mobA) {
+            mobA.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ANGRY_AT, b.getUUID());
+            mobA.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ATTACK_TARGET, b);
+        }
+        if (b instanceof Mob mobB) {
+            mobB.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ANGRY_AT, a.getUUID());
+            mobB.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ATTACK_TARGET, a);
+        }
+
+        // 猪灵蛮兵额外设置愤怒目标
         try {
-            // 猪灵 -> PiglinAi.setAngerTarget
-            makeAngryAt(a, b);
-            makeAngryAt(b, a);
-            // 猪灵蛮兵 -> PiglinBruteAi.setAngerTarget
             if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
                 PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
             }
@@ -160,39 +168,6 @@ public class DuelStaffItem extends Item {
                 PiglinBruteAiInvoker.invokeSetAngerTarget(bruteB, a);
             }
         } catch (Exception ignored) {
-        }
-    }
-
-    /**
-     * 通过反射调用 PiglinAi.setAngerTarget，兼容各版本的方法签名差异
-     */
-    private static void makeAngryAt(LivingEntity attacker, LivingEntity target) {
-        if (!(attacker instanceof net.minecraft.world.entity.monster.piglin.Piglin piglin))
-            return;
-
-        try {
-            // 尝试 2 参数版本: setAngerTarget(AbstractPiglin, LivingEntity)
-            var m2 = net.minecraft.world.entity.monster.piglin.PiglinAi.class
-                .getDeclaredMethod("setAngerTarget",
-                    net.minecraft.world.entity.monster.piglin.AbstractPiglin.class,
-                    net.minecraft.world.entity.LivingEntity.class);
-            m2.setAccessible(true);
-            m2.invoke(null, piglin, target);
-        } catch (NoSuchMethodException e2) {
-            try {
-                // 尝试 3 参数版本: setAngerTarget(ServerLevel, AbstractPiglin, LivingEntity)
-                var m3 = net.minecraft.world.entity.monster.piglin.PiglinAi.class
-                    .getDeclaredMethod("setAngerTarget",
-                        net.minecraft.server.level.ServerLevel.class,
-                        net.minecraft.world.entity.monster.piglin.AbstractPiglin.class,
-                        net.minecraft.world.entity.LivingEntity.class);
-                m3.setAccessible(true);
-                m3.invoke(null, ((net.minecraft.server.level.ServerLevel) piglin.level()), piglin, target);
-            } catch (Exception e3) {
-                // 都失败就放弃
-            }
-        } catch (Exception e) {
-            // 调用失败
         }
     }
 
