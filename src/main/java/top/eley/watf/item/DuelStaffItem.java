@@ -66,22 +66,22 @@ public class DuelStaffItem extends Item {
         Entity targetEntity = getTargetEntity(player, level);
 
         if (targetEntity == null) {
-            player.sendSystemMessage(Component.translatable("msg.watf.no_target"));
+            player.sendOverlayMessage(Component.translatable("msg.watf.no_target"));
             return InteractionResult.FAIL;
         }
 
         if (!(targetEntity instanceof LivingEntity livingTarget)) {
-            player.sendSystemMessage(Component.translatable("msg.watf.cannot_fight"));
+            player.sendOverlayMessage(Component.translatable("msg.watf.cannot_fight"));
             return InteractionResult.FAIL;
         }
 
         if (targetEntity instanceof AgeableMob) {
-            player.sendSystemMessage(Component.translatable("msg.watf.too_passive"));
+            player.sendOverlayMessage(Component.translatable("msg.watf.too_passive"));
             return InteractionResult.FAIL;
         }
 
         if (targetEntity.equals(player)) {
-            player.sendSystemMessage(Component.translatable("msg.watf.no_self"));
+            player.sendOverlayMessage(Component.translatable("msg.watf.no_self"));
             return InteractionResult.FAIL;
         }
 
@@ -90,7 +90,7 @@ public class DuelStaffItem extends Item {
         if (!FIRST_TARGET.containsKey(playerId)) {
             FIRST_TARGET.put(playerId, targetEntity);
             String name = targetEntity.getName().getString();
-            player.sendSystemMessage(Component.translatable("msg.watf.first_selected", name));
+            player.sendOverlayMessage(Component.translatable("msg.watf.first_selected", name));
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0f, 1.5f);
             return InteractionResult.SUCCESS;
@@ -98,17 +98,17 @@ public class DuelStaffItem extends Item {
             Entity firstEntity = FIRST_TARGET.remove(playerId);
 
             if (firstEntity.equals(targetEntity)) {
-                player.sendSystemMessage(Component.translatable("msg.watf.different_opponent"));
+                player.sendOverlayMessage(Component.translatable("msg.watf.different_opponent"));
                 return InteractionResult.FAIL;
             }
 
             if (!firstEntity.isAlive() || firstEntity.isRemoved()) {
-                player.sendSystemMessage(Component.translatable("msg.watf.first_gone"));
+                player.sendOverlayMessage(Component.translatable("msg.watf.first_gone"));
                 return InteractionResult.FAIL;
             }
 
             if (!(firstEntity instanceof LivingEntity firstLiving)) {
-                player.sendSystemMessage(Component.translatable("msg.watf.first_cannot_fight"));
+                player.sendOverlayMessage(Component.translatable("msg.watf.first_cannot_fight"));
                 return InteractionResult.FAIL;
             }
 
@@ -119,7 +119,7 @@ public class DuelStaffItem extends Item {
 
             String name1 = firstEntity.getName().getString();
             String name2 = targetEntity.getName().getString();
-            player.sendSystemMessage(Component.translatable("msg.watf.duel_start", name1, name2));
+            player.sendOverlayMessage(Component.translatable("msg.watf.duel_start", name1, name2));
 
             stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
 

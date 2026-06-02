@@ -67,22 +67,22 @@ public class TeamBattleItem extends Item {
         Entity targetEntity = getTargetEntity(player, level);
 
         if (targetEntity == null) {
-            player.sendSystemMessage(Component.translatable("msg.watf.no_target_team"));
+            player.sendOverlayMessage(Component.translatable("msg.watf.no_target_team"));
             return InteractionResult.FAIL;
         }
 
         if (!(targetEntity instanceof LivingEntity)) {
-            player.sendSystemMessage(Component.translatable("msg.watf.cannot_fight"));
+            player.sendOverlayMessage(Component.translatable("msg.watf.cannot_fight"));
             return InteractionResult.FAIL;
         }
 
         if (targetEntity instanceof AgeableMob) {
-            player.sendSystemMessage(Component.translatable("msg.watf.species_passive"));
+            player.sendOverlayMessage(Component.translatable("msg.watf.species_passive"));
             return InteractionResult.FAIL;
         }
 
         if (targetEntity.equals(player)) {
-            player.sendSystemMessage(Component.translatable("msg.watf.no_self_team"));
+            player.sendOverlayMessage(Component.translatable("msg.watf.no_self_team"));
             return InteractionResult.FAIL;
         }
 
@@ -92,7 +92,7 @@ public class TeamBattleItem extends Item {
 
         if (!FIRST_TYPE.containsKey(playerId)) {
             FIRST_TYPE.put(playerId, targetType);
-            player.sendSystemMessage(Component.translatable("msg.watf.first_species", speciesName));
+            player.sendOverlayMessage(Component.translatable("msg.watf.first_species", speciesName));
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0f, 1.5f);
             return InteractionResult.SUCCESS;
@@ -100,7 +100,7 @@ public class TeamBattleItem extends Item {
             EntityType<?> firstType = FIRST_TYPE.remove(playerId);
 
             if (firstType.equals(targetType)) {
-                player.sendSystemMessage(Component.translatable("msg.watf.different_species"));
+                player.sendOverlayMessage(Component.translatable("msg.watf.different_species"));
                 return InteractionResult.FAIL;
             }
 
@@ -127,12 +127,12 @@ public class TeamBattleItem extends Item {
             }
 
             if (teamA.isEmpty()) {
-                player.sendSystemMessage(Component.translatable("msg.watf.species_not_found", speciesAName));
+                player.sendOverlayMessage(Component.translatable("msg.watf.species_not_found", speciesAName));
                 return InteractionResult.FAIL;
             }
 
             if (teamB.isEmpty()) {
-                player.sendSystemMessage(Component.translatable("msg.watf.species_not_found", speciesBName));
+                player.sendOverlayMessage(Component.translatable("msg.watf.species_not_found", speciesBName));
                 return InteractionResult.FAIL;
             }
 
@@ -151,7 +151,7 @@ public class TeamBattleItem extends Item {
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.WITHER_SPAWN, SoundSource.PLAYERS, 1.0f, 1.0f);
 
-            player.sendSystemMessage(Component.translatable("msg.watf.team_start", speciesAName, teamA.size(), speciesBName, teamB.size()));
+            player.sendOverlayMessage(Component.translatable("msg.watf.team_start", speciesAName, teamA.size(), speciesBName, teamB.size()));
 
             stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
 
