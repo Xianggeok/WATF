@@ -18,7 +18,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import top.eley.watf.mixin.PiglinAiInvoker;
 import top.eley.watf.mixin.PiglinBruteAiInvoker;
 
 import net.minecraft.advancements.AdvancementHolder;
@@ -150,12 +149,10 @@ public class DuelStaffItem extends Item {
         }
 
         try {
-            if (a instanceof net.minecraft.world.entity.monster.piglin.Piglin piglinA) {
-                PiglinAiInvoker.invokeSetAngerTarget(piglinA, b);
-            }
-            if (b instanceof net.minecraft.world.entity.monster.piglin.Piglin piglinB) {
-                PiglinAiInvoker.invokeSetAngerTarget(piglinB, a);
-            }
+            // 猪灵 -> PiglinAi.setAngerTarget
+            makeAngryAt(a, b);
+            makeAngryAt(b, a);
+            // 猪灵蛮兵 -> PiglinBruteAi.setAngerTarget
             if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
                 PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
             }
@@ -163,6 +160,39 @@ public class DuelStaffItem extends Item {
                 PiglinBruteAiInvoker.invokeSetAngerTarget(bruteB, a);
             }
         } catch (Exception ignored) {
+        }
+    }
+
+    /**
+     * 通过反射调用 PiglinAi.setAngerTarget，兼容各版本的方法签名差异
+     */
+    private static void makeAngryAt(LivingEntity attacker, LivingEntity target) {
+        if (!(attacker instanceof net.minecraft.world.entity.monster.piglin.Piglin piglin))
+            return;
+
+        try {
+            // 尝试 2 参数版本: setAngerTarget(AbstractPiglin, LivingEntity)
+            var m2 = net.minecraft.world.entity.monster.piglin.PiglinAi.class
+                .getDeclaredMethod("setAngerTarget",
+                    net.minecraft.world.entity.monster.piglin.AbstractPiglin.class,
+                    net.minecraft.world.entity.LivingEntity.class);
+            m2.setAccessible(true);
+            m2.invoke(null, piglin, target);
+        } catch (NoSuchMethodException e2) {
+            try {
+                // 尝试 3 参数版本: setAngerTarget(ServerLevel, AbstractPiglin, LivingEntity)
+                var m3 = net.minecraft.world.entity.monster.piglin.PiglinAi.class
+                    .getDeclaredMethod("setAngerTarget",
+                        net.minecraft.server.level.ServerLevel.class,
+                        net.minecraft.world.entity.monster.piglin.AbstractPiglin.class,
+                        net.minecraft.world.entity.LivingEntity.class);
+                m3.setAccessible(true);
+                m3.invoke(null, ((net.minecraft.server.level.ServerLevel) piglin.level()), piglin, target);
+            } catch (Exception e3) {
+                // 都失败就放弃
+            }
+        } catch (Exception e) {
+            // 调用失败
         }
     }
 
