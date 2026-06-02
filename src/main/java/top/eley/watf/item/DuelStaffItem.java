@@ -169,28 +169,26 @@ public class DuelStaffItem extends Item {
             return;
 
         try {
-            // 尝试 2 参数版本: setAngerTarget(AbstractPiglin, LivingEntity)
-            var m2 = net.minecraft.world.entity.monster.piglin.PiglinAi.class
-                .getDeclaredMethod("setAngerTarget",
-                    net.minecraft.world.entity.monster.piglin.AbstractPiglin.class,
-                    net.minecraft.world.entity.LivingEntity.class);
-            m2.setAccessible(true);
-            m2.invoke(null, piglin, target);
-        } catch (NoSuchMethodException e2) {
+            // wasHurtBy 是触发猪灵仇恨的标准方式，比 setAngerTarget 更可靠
             try {
-                // 尝试 3 参数版本: setAngerTarget(ServerLevel, AbstractPiglin, LivingEntity)
+                // 尝试 2 参数: wasHurtBy(Piglin, LivingEntity)
+                var m2 = net.minecraft.world.entity.monster.piglin.PiglinAi.class
+                    .getDeclaredMethod("wasHurtBy",
+                        net.minecraft.world.entity.monster.piglin.Piglin.class,
+                        net.minecraft.world.entity.LivingEntity.class);
+                m2.setAccessible(true);
+                m2.invoke(null, piglin, target);
+            } catch (NoSuchMethodException e2) {
+                // 尝试 3 参数: wasHurtBy(ServerLevel, Piglin, LivingEntity)
                 var m3 = net.minecraft.world.entity.monster.piglin.PiglinAi.class
-                    .getDeclaredMethod("setAngerTarget",
+                    .getDeclaredMethod("wasHurtBy",
                         net.minecraft.server.level.ServerLevel.class,
-                        net.minecraft.world.entity.monster.piglin.AbstractPiglin.class,
+                        net.minecraft.world.entity.monster.piglin.Piglin.class,
                         net.minecraft.world.entity.LivingEntity.class);
                 m3.setAccessible(true);
-                m3.invoke(null, ((net.minecraft.server.level.ServerLevel) piglin.level()), piglin, target);
-            } catch (Exception e3) {
-                // 都失败就放弃
+                m3.invoke(null, (net.minecraft.server.level.ServerLevel) piglin.level(), piglin, target);
             }
         } catch (Exception e) {
-            // 调用失败
         }
     }
 
