@@ -139,7 +139,6 @@ public class DuelStaffItem extends Item {
      * 兼容所有AI类型（Goal AI + Brain AI）
      */
     public static void startFight(Level level, LivingEntity a, LivingEntity b) {
-        // 设置目标（对Goal AI生物有效）
         if (a instanceof Mob mobA) {
             mobA.setTarget(b);
         }
@@ -147,25 +146,20 @@ public class DuelStaffItem extends Item {
             mobB.setTarget(a);
         }
 
-        // 对于使用Brain AI的生物，通过AI系统设置愤怒目标
-        if (level instanceof ServerLevel serverLevel) {
-            try {
-                // 普通猪灵 - 使用 PiglinAi.setAngerTarget
-                if (a instanceof net.minecraft.world.entity.monster.piglin.Piglin piglinA) {
-                    PiglinAiInvoker.invokeSetAngerTarget(serverLevel, piglinA, b);
-                }
-                if (b instanceof net.minecraft.world.entity.monster.piglin.Piglin piglinB) {
-                    PiglinAiInvoker.invokeSetAngerTarget(serverLevel, piglinB, a);
-                }
-                // 猪灵蛮兵 - 使用 PiglinBruteAi.setAngerTarget
-                if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
-                    PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
-                }
-                if (b instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteB) {
-                    PiglinBruteAiInvoker.invokeSetAngerTarget(bruteB, a);
-                }
-            } catch (Exception ignored) {
+        try {
+            if (a instanceof net.minecraft.world.entity.monster.piglin.Piglin piglinA) {
+                PiglinAiInvoker.invokeSetAngerTarget(piglinA, b);
             }
+            if (b instanceof net.minecraft.world.entity.monster.piglin.Piglin piglinB) {
+                PiglinAiInvoker.invokeSetAngerTarget(piglinB, a);
+            }
+            if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
+                PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
+            }
+            if (b instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteB) {
+                PiglinBruteAiInvoker.invokeSetAngerTarget(bruteB, a);
+            }
+        } catch (Exception ignored) {
         }
     }
 
