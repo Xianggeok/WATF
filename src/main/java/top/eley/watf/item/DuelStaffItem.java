@@ -148,11 +148,17 @@ public class DuelStaffItem extends Item {
             mobB.setTarget(a);
         }
 
+        // 设置Brain AI目标
+        if (a instanceof Mob mobA) {
+            mobA.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ANGRY_AT, b.getUUID());
+            mobA.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ATTACK_TARGET, b);
+        }
+        if (b instanceof Mob mobB) {
+            mobB.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ANGRY_AT, a.getUUID());
+            mobB.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ATTACK_TARGET, a);
+        }
+
         try {
-            // 猪灵 -> PiglinAi.setAngerTarget
-            makeAngryAt(a, b);
-            makeAngryAt(b, a);
-            // 猪灵蛮兵 -> PiglinBruteAi.setAngerTarget
             if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
                 PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
             }
