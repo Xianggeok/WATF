@@ -19,7 +19,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import top.eley.watf.Watf;
-import top.eley.watf.mixin.PiglinAiInvoker;
 import top.eley.watf.mixin.PiglinBruteAiInvoker;
 
 import net.minecraft.advancements.AdvancementHolder;
@@ -144,22 +143,42 @@ public class DuelStaffItem extends Item {
             mobB.setTarget(a);
         }
 
-        if (level instanceof ServerLevel serverLevel) {
-            try {
-                if (a instanceof net.minecraft.world.entity.monster.piglin.Piglin piglinA) {
-                    PiglinAiInvoker.invokeSetAngerTarget(serverLevel, piglinA, b);
-                }
-                if (b instanceof net.minecraft.world.entity.monster.piglin.Piglin piglinB) {
-                    PiglinAiInvoker.invokeSetAngerTarget(serverLevel, piglinB, a);
-                }
-                if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
-                    PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
-                }
-                if (b instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteB) {
-                    PiglinBruteAiInvoker.invokeSetAngerTarget(bruteB, a);
-                }
-            } catch (Exception ignored) {
+        try {
+            makeAngryAt(a, b);
+            makeAngryAt(b, a);
+            if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
+                PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
             }
+            if (b instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteB) {
+                PiglinBruteAiInvoker.invokeSetAngerTarget(bruteB, a);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    private static void makeAngryAt(LivingEntity attacker, LivingEntity target) {
+        if (!(attacker instanceof net.minecraft.world.entity.monster.piglin.Piglin piglin))
+            return;
+
+        try {
+            var m2 = net.minecraft.world.entity.monster.piglin.PiglinAi.class
+                .getDeclaredMethod("setAngerTarget",
+                    net.minecraft.world.entity.monster.piglin.AbstractPiglin.class,
+                    net.minecraft.world.entity.LivingEntity.class);
+            m2.setAccessible(true);
+            m2.invoke(null, piglin, target);
+        } catch (NoSuchMethodException e2) {
+            try {
+                var m3 = net.minecraft.world.entity.monster.piglin.PiglinAi.class
+                    .getDeclaredMethod("setAngerTarget",
+                        net.minecraft.server.level.ServerLevel.class,
+                        net.minecraft.world.entity.monster.piglin.AbstractPiglin.class,
+                        net.minecraft.world.entity.LivingEntity.class);
+                m3.setAccessible(true);
+                m3.invoke(null, ((net.minecraft.server.level.ServerLevel) piglin.level()), piglin, target);
+            } catch (Exception e3) {
+            }
+        } catch (Exception e) {
         }
     }
 
