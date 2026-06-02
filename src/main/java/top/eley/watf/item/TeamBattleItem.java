@@ -60,7 +60,7 @@ public class TeamBattleItem extends Item {
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return InteractionResult.PASS;
         }
 
@@ -151,7 +151,7 @@ public class TeamBattleItem extends Item {
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.WITHER_SPAWN, SoundSource.PLAYERS, 1.0f, 1.0f);
 
-            player.displayClientMessage(Component.translatable("msg.watf.team_start", speciesAName, teamA.size(), speciesBName, teamB.size()), true);
+            player.sendSystemMessage(Component.translatable("msg.watf.team_start", speciesAName, teamA.size(), speciesBName, teamB.size()));
 
             stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
 
