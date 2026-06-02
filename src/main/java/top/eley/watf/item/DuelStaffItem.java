@@ -143,7 +143,16 @@ public class DuelStaffItem extends Item {
             mobB.setTarget(a);
         }
 
-        // 猪灵蛮兵额外设置愤怒目标
+        // 设置Brain AI目标
+        if (a instanceof Mob mobA) {
+            mobA.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ANGRY_AT, b.getUUID());
+            mobA.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ATTACK_TARGET, b);
+        }
+        if (b instanceof Mob mobB) {
+            mobB.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ANGRY_AT, a.getUUID());
+            mobB.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ATTACK_TARGET, a);
+        }
+
         try {
             if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
                 PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
@@ -152,16 +161,6 @@ public class DuelStaffItem extends Item {
                 PiglinBruteAiInvoker.invokeSetAngerTarget(bruteB, a);
             }
         } catch (Exception ignored) {
-        }
-
-        // 通过微量伤害触发所有生物的仇恨系统
-        if (level instanceof ServerLevel) {
-            if (a instanceof Mob mobA) {
-                mobA.hurt(mobA.damageSources().mobAttack(b instanceof Mob m ? m : mobA), 0.001f);
-            }
-            if (b instanceof Mob mobB) {
-                mobB.hurt(mobB.damageSources().mobAttack(a instanceof Mob m ? m : mobB), 0.001f);
-            }
         }
     }
 
