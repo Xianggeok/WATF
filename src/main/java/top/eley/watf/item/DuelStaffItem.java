@@ -136,7 +136,7 @@ public class DuelStaffItem extends Item {
         }
     }
 
-    public static void startFight(LivingEntity a, LivingEntity b) {
+    public static void startFight(Level level, LivingEntity a, LivingEntity b) {
         if (a instanceof Mob mobA) {
             mobA.setTarget(b);
         }
@@ -144,19 +144,30 @@ public class DuelStaffItem extends Item {
             mobB.setTarget(a);
         }
 
-        try {
-            if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
-                PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
-            }
-            if (b instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteB) {
-                PiglinBruteAiInvoker.invokeSetAngerTarget(bruteB, a);
-            }
-        } catch (Exception e) {
-            if (a instanceof Mob mobA && b instanceof Mob mobB) {
-                mobA.hurt(mobA.damageSources().mobAttack(mobB), 0.001f);
-                mobB.hurt(mobB.damageSources().mobAttack(mobA), 0.001f);
-                mobA.setTarget(b);
-                mobB.setTarget(a);
+        // 对于使用Brain AI的生物（猪灵、猪灵蛮兵），需要通过AI系统设置愤怒目标
+        if (level instanceof ServerLevel serverLevel) {
+            try {
+                // 普通猪灵 - 使用 PiglinAi.setAngerTarget
+                if (a instanceof net.minecraft.world.entity.monster.piglin.Piglin piglinA) {
+                    PiglinAiInvoker.invokeSetAngerTarget(serverLevel, piglinA, b);
+                }
+                if (b instanceof net.minecraft.world.entity.monster.piglin.Piglin piglinB) {
+                    PiglinAiInvoker.invokeSetAngerTarget(serverLevel, piglinB, a);
+                }
+                // 猪灵蛮兵
+                if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
+                    PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
+                }
+                if (b instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteB) {
+                    PiglinBruteAiInvoker.invokeSetAngerTarget(bruteB, a);
+                }
+            } catch (Exception e) {
+                if (a instanceof Mob mobA && b instanceof Mob mobB) {
+                    mobA.hurt(mobA.damageSources().mobAttack(mobB), 0.001f);
+                    mobB.hurt(mobB.damageSources().mobAttack(mobA), 0.001f);
+                    mobA.setTarget(b);
+                    mobB.setTarget(a);
+                }
             }
         }
     }
