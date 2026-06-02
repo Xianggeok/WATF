@@ -143,9 +143,8 @@ public class DuelStaffItem extends Item {
             mobB.setTarget(a);
         }
 
+        // 猪灵蛮兵额外设置愤怒目标
         try {
-            makeAngryAt(a, b);
-            makeAngryAt(b, a);
             if (a instanceof net.minecraft.world.entity.monster.piglin.PiglinBrute bruteA) {
                 PiglinBruteAiInvoker.invokeSetAngerTarget(bruteA, b);
             }
@@ -154,31 +153,15 @@ public class DuelStaffItem extends Item {
             }
         } catch (Exception ignored) {
         }
-    }
 
-    private static void makeAngryAt(LivingEntity attacker, LivingEntity target) {
-        if (!(attacker instanceof net.minecraft.world.entity.monster.piglin.Piglin piglin))
-            return;
-
-        try {
-            var m2 = net.minecraft.world.entity.monster.piglin.PiglinAi.class
-                .getDeclaredMethod("setAngerTarget",
-                    net.minecraft.world.entity.monster.piglin.AbstractPiglin.class,
-                    net.minecraft.world.entity.LivingEntity.class);
-            m2.setAccessible(true);
-            m2.invoke(null, piglin, target);
-        } catch (NoSuchMethodException e2) {
-            try {
-                var m3 = net.minecraft.world.entity.monster.piglin.PiglinAi.class
-                    .getDeclaredMethod("setAngerTarget",
-                        net.minecraft.server.level.ServerLevel.class,
-                        net.minecraft.world.entity.monster.piglin.AbstractPiglin.class,
-                        net.minecraft.world.entity.LivingEntity.class);
-                m3.setAccessible(true);
-                m3.invoke(null, ((net.minecraft.server.level.ServerLevel) piglin.level()), piglin, target);
-            } catch (Exception e3) {
+        // 通过微量伤害触发所有生物的仇恨系统
+        if (level instanceof ServerLevel) {
+            if (a instanceof Mob mobA) {
+                mobA.hurt(mobA.damageSources().mobAttack(b instanceof Mob m ? m : mobA), 0.001f);
             }
-        } catch (Exception e) {
+            if (b instanceof Mob mobB) {
+                mobB.hurt(mobB.damageSources().mobAttack(a instanceof Mob m ? m : mobB), 0.001f);
+            }
         }
     }
 
