@@ -138,12 +138,22 @@ public class DuelStaffItem extends Item {
      * 兼容所有AI类型（Goal AI + Brain AI）
      */
     public static void startFight(Level level, LivingEntity a, LivingEntity b) {
-        // 设置目标（对Goal AI生物有效）
+        // 设置Goal AI目标
         if (a instanceof Mob mobA) {
             mobA.setTarget(b);
         }
         if (b instanceof Mob mobB) {
             mobB.setTarget(a);
+        }
+
+        // 设置Brain AI目标（猪灵等Brain AI生物需要设置ATTACK_TARGET才能攻击）
+        if (a instanceof Mob mobA) {
+            mobA.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ANGRY_AT, b.getUUID());
+            mobA.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ATTACK_TARGET, b);
+        }
+        if (b instanceof Mob mobB) {
+            mobB.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ANGRY_AT, a.getUUID());
+            mobB.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.ATTACK_TARGET, a);
         }
 
         // 猪灵蛮兵额外设置愤怒目标（PiglinBruteAiInvoker 已验证有效）
@@ -155,17 +165,6 @@ public class DuelStaffItem extends Item {
                 PiglinBruteAiInvoker.invokeSetAngerTarget(bruteB, a);
             }
         } catch (Exception ignored) {
-        }
-
-        // 通过微量伤害触发所有生物的仇恨系统
-        // 猪灵等Brain AI生物需要被攻击事件才能激活行为树中的攻击行为
-        if (level instanceof ServerLevel) {
-            if (a instanceof Mob mobA) {
-                mobA.hurt(mobA.damageSources().mobAttack(b instanceof Mob m ? m : mobA), 0.001f);
-            }
-            if (b instanceof Mob mobB) {
-                mobB.hurt(mobB.damageSources().mobAttack(a instanceof Mob m ? m : mobB), 0.001f);
-            }
         }
     }
 
