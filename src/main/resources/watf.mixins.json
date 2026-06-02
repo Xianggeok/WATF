@@ -6,7 +6,6 @@
   "mixins": [
     "ExampleMixin",
     "MobMixin",
-    "PiglinAiInvoker",
     "PiglinBruteAiMixin",
     "PiglinBruteAiInvoker"
   ],
